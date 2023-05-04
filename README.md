@@ -1,4 +1,5 @@
-# API-Algafood
+# Algafood-API
  <b>Curso de Especialista Spring Rest</b>
- ESR - Algaworks
+ 
+ Em Andamento - Algaworks
  
