@@ -1,0 +1,73 @@
+-------- CONSULTA DINÂMICA COM JPQL --------
+
+@Repository
+public class RestauranteRepositoryImpl implements RestauranteRepositoryQueries {
+
+	@PersistenceContext
+	private EntityManager manager;
+	 
+	public List<Restaurante> find(String nome, BigDecimal taxaFreteInicial, BigDecimal taxaFreteFinal){
+		var jpql = new StringBuilder();
+		jpql.append("from Restaurante where 0=0 ");
+		
+		var parametros = new HashMap<String, Object>();
+		
+		if(StringUtils.hasLength(nome)) {
+			jpql.append("and nome like :nome ");
+			parametros.put("nome", "%" + nome + "%");
+		}
+		if(taxaFreteInicial != null) {
+			jpql.append("and taxaFrete >= :taxaInicial ");
+			parametros.put("taxaInicial", taxaFreteInicial);
+		}
+		
+		if(taxaFreteFinal != null) {
+			jpql.append("and taxaFrete <= :taxaFinal ");
+			parametros.put("taxaFinal", taxaFreteFinal);
+		}
+		
+		
+		TypedQuery<Restaurante> query = manager.createQuery(jpql.toString(), Restaurante.class);
+				parametros.forEach((chave, valor) -> query.setParameter(chave, valor));
+				
+				return query.getResultList();
+	}
+ 
+ -------- CONSULTA DINÂMICA COM CRITERIA PARA CASOS MUITO COMPLEXOS ONDE JPQL NÃO VALE A PENA --------
+ 
+	 @Repository
+	 public class RestauranteRepositoryImpl implements RestauranteRepositoryQueries {
+
+			@PersistenceContext
+			private EntityManager manager;
+			
+			@Override
+			public List<Restaurante> find(String nome, BigDecimal taxaFreteInicial, BigDecimal taxaFreteFinal){
+		
+		/**
+		OBS1:
+		 * Busca o CriteriaBuilder do EntityManager.
+		 * O criteriaBuilder cria várias expressões que podemos usar para construir nossas consultas
+		 * dinâmicas, como: and, concat
+		 */
+			CriteriaBuilder builder = manager.getCriteriaBuilder(); 
+		
+		
+		/**
+		OBS2:
+		 CriteriaQuery é um construtor de cláusulas 
+			Gerar uma instância de CriteriaQuery com o CriteriaBuilder.
+		 */
+		
+			CriteriaQuery<Restaurante> criteria = builder.createQuery(Restaurante.class); 
+			criteria.from(Restaurante.class); //from Restaurante
+		
+		/**
+		OBS3:
+		É preciso transformar  manager.createQuery(criteria) em uma TypedQuery para que se tenha o getResultList();
+		*/
+		
+			TypedQuery<Restaurante> query = manager.createQuery(criteria);
+			return query.getResultList();
+	}
+}
