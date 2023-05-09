@@ -4,18 +4,7 @@
  Em Andamento - Algaworks
  
  # Desenvolvimento
- 
- Utilizado Linguagem Java e Spring Boot seguindo os padrões Rest.
-
-# Pré-requisito
-
-Para construir e executar o aplicativo, você precisa ter as seguintes dependências estejam corretamente instaladas:
-- JDK 11
-- Maven 3.9.1 
-- Lombok(https://projectlombok.org/download) (Habilite o plugin na sua IDE)
-- MySql - 8
-- Jakarta Bean Validation
-- Flyway
+ Java e Spring Boot seguindo os padrões Rest. Projeto piloto, com foco em aprendizagem, podendo conter anotações com esse objetivo.
 
 # Conteúdo aprendido até o momento:
 - Spring e injeção de dependências
@@ -27,7 +16,15 @@ Para construir e executar o aplicativo, você precisa ter as seguintes dependên
 - Tratamento de Exception e ExceptionHandler
 - Bean Validation
 
+# Pré-requisito
 
+Para construir e executar o aplicativo, você precisa ter as seguintes dependências estejam corretamente instaladas:
+- JDK 11
+- Maven 3.9.1 
+- Lombok(https://projectlombok.org/download) (Habilite o plugin na sua IDE)
+- MySql - 8
+- Jakarta Bean Validation
+- Flyway
 
 
  
