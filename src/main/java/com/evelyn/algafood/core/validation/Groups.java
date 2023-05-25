@@ -1,4 +1,4 @@
-package com.evelyn.algafood;
+package com.evelyn.algafood.core.validation;
 
 public interface Groups {
 

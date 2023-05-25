@@ -1,0 +1,194 @@
+
+**MESSAGES.PROPERTIES
+
+# Se algum dia precisar, não é muito utilizado.
+# Personalizando o bean validation sem sobreposicao do spring no message.properties.
+# incluir na notação do domain PositiveOrZero(message = "{TaxaFrete.invalida}")
+# Para funcionar Comentar PositiveOrZero={0} deve ser um valor maior ou igual a zero
+
+javax.validation.constraints.PositiveOrZero.message=deve ser um número positivo
+TaxaFrete.invalida=Taxa frete está inválida, informe um valor positivo
+
+
+-------------------------------------------------------------------------------------
+**CRIANDO UMA ANOTAÇÃO COM COMPOSIÇÃO:
+no caso compondo a 	@PositiveOrZero...
+
+1 - CRIA A @interface TaxaFrete  E COMPÕE PositiveZero PARA SER A REGRA
+
+	@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE }) //onde pode ser utilizado
+	@Retention(RUNTIME)	//encontrar essa anotação em tempo de execucao
+	@Constraint(validatedBy = { }) 	//identifica com uma constraint do spring
+	@PositiveOrZero	//a regra de negócio que estou colocando para fazer valer a taxa frete.
+	public @interface TaxaFrete {
+	
+		@OverridesAttribute(constraint = PositiveOrZero.class, name = "message") 	// essa notação subsescre tudo o que está na mensagem de PositiveOrZero na mensagem customizada no default.
+		String message() default "{TaxaFrete.invalida}";
+	
+		Class<?>[] groups() default { };
+	
+		Class<? extends Payload>[] payload() default { };
+	}
+	
+1 - ANOTAR A CLASSE
+
+	@TaxaFrete 
+	@NotNull
+	@PositiveOrZero
+	@Column (name= "taxa_frete", nullable = false)
+	private BigDecimal taxaFrete;
+	
+
+3 - incluir no messages.properties para que possa ser encontrada pela interface.
+
+TaxaFrete.invalida= {0} está inválida. Tente um valor maior que zero.
+
+-------------------------------------------------------------
+
+**CRIANDO UMA ANOTAÇÃO E PERSONALIZANDO REGRA DE NEGÓCIO NELA, COM
+CÓDIGO JAVA
+
+
+1- CRIA A @INTERFACE
+ * Criando constraints de validação customizadas com implementação de ConstraintValidator
+implementando a lógica com código java, 
+Adicionar o atributo número para ser chamado na especificação da anotação.
+
+
+
+	@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE }) //onde pode ser utilizado
+	@Retention(RUNTIME)	//encontrar essa anotação em tempo de execucao
+	@Constraint(validatedBy = { })
+	public @interface Multiplo {
+	
+		String message() default "Múltiplo inválido";
+	
+		Class<?>[] groups() default { };
+	
+		Class<? extends Payload>[] payload() default { };
+		
+		int numero();
+	}
+
+2- ANOTA A CLASSE
+	@Multiplo(numero = 5)  // personalizar e criar lógica na anotação, nesse caso, validar só multiplos de algum número
+	@NotNull
+	@PositiveOrZero
+	@Column (name= "taxa_frete", nullable = false)
+	private BigDecimal taxaFrete;
+	
+3 - CRIAR CLASSE DE VALIDAÇÃO
+
+* Implements ConstraintValidator com qual @interface de anotação, e o tipo. Number engloba todos
+	os números.
+
+	public class MultiploValidator implements ConstraintValidator<Multiplo, Number>{
+	
+		private int numeroMultiplo;
+		
+* Inicializa o validador para chamadas futuras do método isValid.
+Só é necessário por causa do número, para a variável numeroMultiplo irá receber a instância de Múltiplo.
+		 
+		@Override
+		public void initialize(Multiplo constraintAnnotation) {
+			
+			this.numeroMultiplo = constraintAnnotation.numero();	//buscará o númreo especificado no uso da anotação
+		}
+		
+		/*
+		 * Implementa a lógica de validação
+		 */
+		@Override
+		public boolean isValid(Number value, ConstraintValidatorContext context) {
+			boolean valido = true;
+			
+			if(value != null) {
+				BigDecimal valorDecimal = BigDecimal.valueOf(value.doubleValue()); //transformando o value de number para double aceito pelo valueOf
+				BigDecimal multiploDecimal = BigDecimal.valueOf(this.numeroMultiplo);
+				BigDecimal resto = valorDecimal.remainder(multiploDecimal); //remainder faz a função do %, divide um número pelo outro.
+				
+				valido = BigDecimal.ZERO.equals(resto); //é válido se zero em BigDecima for igual o resultado da divisão feita va variável resto. 
+			}
+			return valido;
+		}
+	}
+	
+3 - INSERIR na interface que está com a contraint vazia, a classe que ele tem que validar.
+
+	 @Constraint(validatedBy = {MultiploValidator.class})
+	
+4 - INSERIR NO MESSAGES.PROPERTIES A ANOTAÇÃO GENÉRICA
+
+	Multiplo={0} deve ser um valor múltiplo de {1}
+	
+--------------------------------------------------------------------------------------------
+
+***PERSONALIZANDO VALIDADORES A NÍVEL DE CLASSE
+[imagine na situação que todo restaurante que oferece taxaFrete igual a zero, tem que receber no nome a descrição frete grátis. 
+O mercado livre faz isso nas ofertas full e frete grátis]
+
+1 - NA CLASSE RESTAURANTE CRIAR A ANOTAÇÃO
+
+@ValorZeroIncluiDescricao(valorField = "taxaFrete", descricaoField = "nome", descricaoObrigatoria = "Frete Grátis")
+@Data
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@Entity
+public class Restaurante {
+
+2 - GERAR A ANOTATION
+detalhe no Target do Java, habilitar somente o tipo que se refere as classes
+
+	@Target({ElementType.TYPE }) 
+	@Retention(RUNTIME)	//encontrar essa anotação em tempo de execucao
+	@Constraint(validatedBy = {})
+	public @interface ValorZeroIncluiDescricao {
+		
+		String message() default "descrição obrigatória inválida";
+	
+		Class<?>[] groups() default { };
+	
+		Class<? extends Payload>[] payload() default { };
+		
+		String valorField();
+		String descricaoField();
+		String descricaoObrigatoria();
+		
+	}
+
+3 - GERAR A CLASSE DE IMPLEMENTAÇÃO ==AULA 9.18=== NÃO ENTENDI BEM
+
+public class ValorZeroIncluiDescricaoValidator implements ConstraintValidator<ValorZeroIncluiDescricao, Object> {
+
+	private String valorField;
+	private String descricaoField;
+	private String descricaoObrigatoria;	
+	
+	@Override
+	public void initialize(ValorZeroIncluiDescricao constraint) {
+		this.valorField = constraint.valorField();
+		this.descricaoField = constraint.descricaoField();
+		this.descricaoObrigatoria = constraint.descricaoObrigatoria();
+	}
+	
+	@Override
+	public boolean isValid(Object objetoValidacao, ConstraintValidatorContext context) {
+		boolean valido = true;
+		
+		try {
+			BigDecimal valor = (BigDecimal) BeanUtils.getPropertyDescriptor(objetoValidacao.getClass(), valorField)
+					.getReadMethod().invoke(objetoValidacao);
+			
+			String descricao = (String) BeanUtils.getPropertyDescriptor(objetoValidacao.getClass(), descricaoField)
+					.getReadMethod().invoke(objetoValidacao);
+			
+			if(valor != null && BigDecimal.ZERO.compareTo(valor) == 0 && descricao != null){
+				valido = descricao.toLowerCase().contains(this.descricaoObrigatoria.toLowerCase());
+			}
+			return valido;
+			
+		} catch (Exception e) {
+			throw new ValidationException(e);
+		} 
+	}
+
+}

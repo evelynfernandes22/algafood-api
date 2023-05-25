@@ -26,12 +26,14 @@ import javax.validation.groups.Default;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import com.evelyn.algafood.Groups;
+import com.evelyn.algafood.core.validation.Groups;
+import com.evelyn.algafood.core.validation.ValorZeroIncluiDescricao;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+@ValorZeroIncluiDescricao(valorField = "taxaFrete", descricaoField = "nome", descricaoObrigatoria = "Frete Grátis")
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
@@ -46,6 +48,9 @@ public class Restaurante {
 	@Column(nullable=false)
 	private String nome;
 
+//	@Multiplo(numero = 5)  // personalizar e criar lógica na anotação, nesse caso, validar só multiplos de algum número
+//	@TaxaFrete //personalizando a anotação com composição "compondo a PositiveOrZero nela"
+	@NotNull
 	@PositiveOrZero
 	@Column (name= "taxa_frete", nullable = false)
 	private BigDecimal taxaFrete;

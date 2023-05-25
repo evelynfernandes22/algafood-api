@@ -8,7 +8,7 @@ import javax.persistence.Id;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-import com.evelyn.algafood.Groups.EstadoId;
+import com.evelyn.algafood.core.validation.Groups.EstadoId;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
