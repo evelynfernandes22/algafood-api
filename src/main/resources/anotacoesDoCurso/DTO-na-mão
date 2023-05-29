@@ -7,7 +7,7 @@ NA CLASSE CONTROLLER
 	public RestauranteDTO buscar(@PathVariable ("restauranteId") Long restauranteId){
 		Restaurante restaurante =  cadastroRestauranteService.buscarOuFalhar(restauranteId);
 		
-		//CONVERNTENDO RESTAURANTE PARA RESTAURANTEDTO
+		//CONVERNTENDO RESTAURANTE PARA RestauranteDTO
 		
 		RestauranteDTO dto = new RestauranteDTO();
 		dto.setId(restaurante.getId());
@@ -24,23 +24,8 @@ NA CLASSE CONTROLLER
 		return dto;
 	}
 
-EXTRAÇÃO DO BLOCO DE CÓDIGO QUE SERÁ MUITO UTILIZADO
 
-	private RestauranteDTO toModelDTO(Restaurante restaurante) {
-		RestauranteDTO dto = new RestauranteDTO();
-		dto.setId(restaurante.getId());
-		dto.setNome(restaurante.getNome());
-		dto.setTaxaFrete(restaurante.getTaxaFrete());
-		
-		CozinhaDTO cozinhaDto = new CozinhaDTO();
-		cozinhaDto.setId(restaurante.getCozinha().getId());
-		cozinhaDto.setNome(restaurante.getCozinha().getNome());
-		
-		dto.setCozinha(cozinhaDto);
-		return dto;
-	}
-
-O CÓDIGO DE BSUCAR FICA ASSIM...
+COM O CÓDIGO EXTRAÍDO NO MÉTODO ACIMA COM O TOMODEL, O CÓDIGO DE BSUCAR FICA ASSIM...
 
 	@GetMapping("/{restauranteId}")
 	public RestauranteDTO buscar(@PathVariable ("restauranteId") Long restauranteId){
@@ -138,4 +123,50 @@ ADICIONAR
 		} catch (CozinhaNaoEncontradaException e) {
 			throw new NegocioException(e.getMessage(), e);
 		}
+	}
+---------------------------------- MÉTODOS AUXILIARES NO CONTROLLER ------------------------------------
+
+Inicialmente pode-se utilizar no controlador, mas o correto é criar uma classe 
+para colocar esses métodos para fazer as chamadas. Assim fica mais legível.
+As vezes, quando tem muitos endpoints, dá para quebrar em mais uma classe de controlador, o que dá mais
+vantagem em separar os métodos abaixo. São as sub-collection resources.
+
+---------------- CONVERTENDO EM DTO ------------------
+
+	private RestauranteDTO toModelDTO(Restaurante restaurante) {
+		RestauranteDTO dto = new RestauranteDTO();
+		dto.setId(restaurante.getId());
+		dto.setNome(restaurante.getNome());
+		dto.setTaxaFrete(restaurante.getTaxaFrete());
+		
+		CozinhaDTO cozinhaDto = new CozinhaDTO();
+		cozinhaDto.setId(restaurante.getCozinha().getId());
+		cozinhaDto.setNome(restaurante.getCozinha().getNome());
+		
+		dto.setCozinha(cozinhaDto);
+		return dto;
+	}
+---------------- CONVERTENDO UMA COLEÇÃO PARA DTO ------------------
+
+	private List<RestauranteDTO> toCollectionModel(List<Restaurante> restaurantes){
+		
+		return restaurantes.stream()
+				.map(restaurante -> toModel(restaurante))
+				.collect(Collectors.toList());
+	}
+	
+
+
+---------------- CONVERTENDO UM IMPUT EM DOMAIN ------------------
+	
+	private Restaurante toDomainObject(RestauranteInput restauranteInput) {
+		Restaurante restaurante = new Restaurante();
+		restaurante.setNome(restauranteInput.getNome());
+		restaurante.setTaxaFrete(restauranteInput.getTaxaFrete());
+		
+		Cozinha cozinha = new Cozinha();
+		cozinha.setId(restauranteInput.getCozinhaId().getId());
+		restaurante.setCozinha(cozinha);
+		
+		return restaurante;
 	}
