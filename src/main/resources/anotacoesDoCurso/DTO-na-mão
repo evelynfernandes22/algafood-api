@@ -1,0 +1,141 @@
+
+NA CLASSE CONTROLLER
+
+---------------- BUSCAR------------------
+	
+	@GetMapping("/{restauranteId}")
+	public RestauranteDTO buscar(@PathVariable ("restauranteId") Long restauranteId){
+		Restaurante restaurante =  cadastroRestauranteService.buscarOuFalhar(restauranteId);
+		
+		//CONVERNTENDO RESTAURANTE PARA RESTAURANTEDTO
+		
+		RestauranteDTO dto = new RestauranteDTO();
+		dto.setId(restaurante.getId());
+		dto.setNome(restaurante.getNome());
+		dto.setTaxaFrete(restaurante.getTaxaFrete());
+		
+		//para abrir um novo bloco de cozinha com id e nome precisa instanciar
+		CozinhaDTO cozinhaDto = new CozinhaDTO();
+		cozinhaDto.setId(restaurante.getCozinha().getId());
+		cozinhaDto.setNome(restaurante.getCozinha().getNome());
+		
+		dto.setCozinha(cozinhaDto); 	//set na cozinha do Restaurante
+		
+		return dto;
+	}
+
+EXTRAÇÃO DO BLOCO DE CÓDIGO QUE SERÁ MUITO UTILIZADO
+
+	private RestauranteDTO toModelDTO(Restaurante restaurante) {
+		RestauranteDTO dto = new RestauranteDTO();
+		dto.setId(restaurante.getId());
+		dto.setNome(restaurante.getNome());
+		dto.setTaxaFrete(restaurante.getTaxaFrete());
+		
+		CozinhaDTO cozinhaDto = new CozinhaDTO();
+		cozinhaDto.setId(restaurante.getCozinha().getId());
+		cozinhaDto.setNome(restaurante.getCozinha().getNome());
+		
+		dto.setCozinha(cozinhaDto);
+		return dto;
+	}
+
+O CÓDIGO DE BSUCAR FICA ASSIM...
+
+	@GetMapping("/{restauranteId}")
+	public RestauranteDTO buscar(@PathVariable ("restauranteId") Long restauranteId){
+		Restaurante restaurante =  cadastroRestauranteService.buscarOuFalhar(restauranteId);
+		
+		RestauranteDTO dto = toModelDTO(restaurante);
+		
+		return dto;
+	}
+
+	
+---------------- LISTAR------------------
+	
+	@GetMapping
+	public List<RestauranteDTO> listar(){
+		return toCollectionRepresentationModel(restauranteRepository.findAll());
+		
+	}
+	
+	//MÉTODO PRIVADO PARA CONVERSÃO
+	private List<RestauranteDTO> toCollectionRepresentationModel(List<Restaurante> restaurantes){
+		
+		return restaurantes.stream()
+				.map(restaurante -> toRepresentationModel(restaurante))
+				.collect(Collectors.toList());
+	}
+	
+---------------- DEMAIS MÉTODOS É SÓ ACRESCENTAR AS CONVERSÕES PRIVADAS ------------------
+
+ADICIONAR 
+=> DE...
+	@PostMapping
+	@ResponseStatus(value = HttpStatus.CREATED)
+	public Restaurante adicionar (@RequestBody @Valid Restaurante restaurante){
+		try {
+			return cadastroRestauranteService.salvar(restaurante);
+			
+		} catch (CozinhaNaoEncontradaException e) {
+			throw new NegocioException(e.getMessage(), e);
+		}
+	}
+
+=> PARA...
+	@PostMapping
+	@ResponseStatus(value = HttpStatus.CREATED)
+	public RestauranteDTO adicionar (@RequestBody @Valid Restaurante restaurante){
+		try {
+			return toRepresentationModel(cadastroRestauranteService.salvar(restaurante));
+			
+		} catch (CozinhaNaoEncontradaException e) {
+			throw new NegocioException(e.getMessage(), e);
+		}
+	}
+
+---------------- CONVERTENDO UM IMPUT EM DOMAIN ------------------
+	
+	private Restaurante toDomainObject(RestauranteInput restauranteInput) {
+		Restaurante restaurante = new Restaurante();
+		restaurante.setNome(restauranteInput.getNome());
+		restaurante.setTaxaFrete(restauranteInput.getTaxaFrete());
+		
+		Cozinha cozinha = new Cozinha();
+		cozinha.setId(restauranteInput.getCozinhaId().getId());
+		restaurante.setCozinha(cozinha);
+		
+		return restaurante;
+	}
+	
+=> O METODO POST FICA ASSIM...TUDO ISOLADO DO DOMAIN MODEL
+
+	@PostMapping
+	@ResponseStatus(value = HttpStatus.CREATED)
+	public RestauranteDTO adicionar (@RequestBody @Valid RestauranteInput restauranteInput){
+		try {
+			Restaurante restaurante = toDomainObject(restauranteInput);
+			
+			return toModel(cadastroRestauranteService.salvar(restaurante));
+			
+		} catch (CozinhaNaoEncontradaException e) {
+			throw new NegocioException(e.getMessage(), e);
+		}
+	}
+	
+	
+	@PutMapping("/{restauranteId}")
+	public RestauranteDTO atualizar(@PathVariable Long restauranteId,@RequestBody @Valid RestauranteInput restauranteInput){
+		
+		try {
+			Restaurante restaurante = toDomainObject(restauranteInput);
+			Restaurante restauranteAtual = cadastroRestauranteService.buscarOuFalhar(restauranteId);
+			BeanUtils.copyProperties(restaurante, restauranteAtual,"id", "formasPagamento", "endereco", 
+					"dataCadastro", "dataAtualizacao", "produtos");
+			return toModel(cadastroRestauranteService.salvar(restauranteAtual));
+			
+		} catch (CozinhaNaoEncontradaException e) {
+			throw new NegocioException(e.getMessage(), e);
+		}
+	}

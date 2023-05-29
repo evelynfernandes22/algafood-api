@@ -1,5 +1,7 @@
 package com.evelyn.algafood.domain.service;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -22,6 +24,7 @@ public class CadastroRestauranteService {
 	@Autowired
 	private CadastroCozinhaService cadastroCozinhaService;
 
+	@Transactional
 	public Restaurante salvar(Restaurante restaurante) {
 
 		Long cozinhaId = restaurante.getCozinha().getId();
@@ -31,7 +34,7 @@ public class CadastroRestauranteService {
 
 		return restauranteRepository.save(restaurante);
 	}
-
+	@Transactional
 	public void excluir(Long restauranteId) {
 		try {
 			restauranteRepository.deleteById(restauranteId);

@@ -1,6 +1,7 @@
 package com.evelyn.algafood.api.exceptionHandler;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,6 +49,8 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler{
 		ProblemType problemType = ProblemType.ERRO_NEGOCIO;
 		String detail = MSG_ERRO_NAO_CAPTURADO_USUARIO_FINAL;
 		
+		ex.printStackTrace();
+		
 		Problem problem = createProblemBuilder(status, problemType, detail)
 				.userMessage(detail)
 				.build();
@@ -57,6 +60,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler{
 	
 	@ExceptionHandler({ValidacaoException.class})
 	public ResponseEntity<Object> handleValidacaoException(ValidacaoException ex, WebRequest request){
+		ex.printStackTrace();
 		return handleValidationInternal(ex, ex.getBindingResult(), new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
 	}
 	
@@ -98,7 +102,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler{
 		
 		Problem problem = createProblemBuilder(status, problemType, detail)
 				.userMessage(MSG_ERRO_NAO_CAPTURADO_USUARIO_FINAL)
-				.timestamp(LocalDateTime.now())
+				.timestamp(OffsetDateTime.now())
 				.build();
 		
 		return handleExceptionInternal(ex, problem, headers, status, request);
@@ -207,14 +211,14 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler{
 
 			if(body == null) {
 				body = Problem.builder()
-						.timestamp(LocalDateTime.now())
+						.timestamp(OffsetDateTime.now())
 						.title(status.getReasonPhrase())
 						.status(status.value())
 						.userMessage(MSG_ERRO_NAO_CAPTURADO_USUARIO_FINAL)
 						.build();
 			}else if(body instanceof String) {
 				body = Problem.builder()
-						.timestamp(LocalDateTime.now())
+						.timestamp(OffsetDateTime.now())
 						.title((String)body)
 						.status(status.value())
 						.userMessage(MSG_ERRO_NAO_CAPTURADO_USUARIO_FINAL)
@@ -275,7 +279,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler{
 	private Problem.ProblemBuilder createProblemBuilder(HttpStatus status,ProblemType problemType ,String detail) {
 		
 		return Problem.builder()
-				.timestamp(LocalDateTime.now())
+				.timestamp(OffsetDateTime.now())
 				.status(status.value())
 				.type(problemType.getUri())
 				.title(problemType.getTitle())
