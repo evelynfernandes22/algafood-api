@@ -1,6 +1,7 @@
 package com.evelyn.algafood.api.DTO;
 
 import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -26,6 +27,12 @@ public class RestauranteDTO {
 	@Valid
 	@NotNull
 	private CozinhaDTO cozinha;
+	
+	@NotNull
+	private OffsetDateTime dataCadastro;
+	
+	@NotNull
+	private OffsetDateTime dataAtualizacao;
 	
 
 }

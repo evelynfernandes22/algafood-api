@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.evelyn.algafood.api.DTO.CozinhaDTO;
 import com.evelyn.algafood.api.DTO.RestauranteDTO;
 import com.evelyn.algafood.domain.model.Restaurante;
 

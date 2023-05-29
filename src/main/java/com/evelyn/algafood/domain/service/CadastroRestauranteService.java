@@ -1,5 +1,7 @@
 package com.evelyn.algafood.domain.service;
 
+import java.time.OffsetDateTime;
+
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,13 +33,15 @@ public class CadastroRestauranteService {
 		Cozinha cozinha = cadastroCozinhaService.buscarOuFalhar(cozinhaId);
 
 		restaurante.setCozinha(cozinha);
-
+		
 		return restauranteRepository.save(restaurante);
 	}
+
 	@Transactional
 	public void excluir(Long restauranteId) {
 		try {
 			restauranteRepository.deleteById(restauranteId);
+			restauranteRepository.flush();
 
 		} catch (EmptyResultDataAccessException e) {
 			throw new RestauranteNaoEncontradoException(restauranteId);

@@ -1,0 +1,84 @@
+package com.evelyn.algafood.api.assembler;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.evelyn.algafood.api.DTO.RestauranteDTO;
+import com.evelyn.algafood.domain.model.Restaurante;
+
+import lombok.AllArgsConstructor;
+
+@AllArgsConstructor
+@Component
+public class RestauranteDtoAssembler {
+	
+	private ModelMapper modelMapper; 
+	
+	public RestauranteDTO toModel(Restaurante restaurante) {
+		return modelMapper.map(restaurante, RestauranteDTO.class);
+	}
+	
+	public List<RestauranteDTO> toCollectionModel(List<Restaurante> restaurantes){
+		
+		return restaurantes.stream()
+				.map(restaurante -> toModel(restaurante))
+				.collect(Collectors.toList());
+	}
+
+}
+
+-----------------------------DISASSEMBLER----------------------------------------
+package com.evelyn.algafood.api.assembler;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.evelyn.algafood.api.DTO.input.RestauranteInput;
+import com.evelyn.algafood.domain.model.Cozinha;
+import com.evelyn.algafood.domain.model.Restaurante;
+
+@Component
+public class RestauranteInputDisassembler {
+	
+	@Autowired
+	private ModelMapper modelMapper;
+	
+	public Restaurante toDomainObject(RestauranteInput restauranteInput) {
+		return  modelMapper.map(restauranteInput, Restaurante.class);
+	}
+	
+//	public Restaurante toDomainObject(RestauranteInput restauranteInput) {
+////		return modelMapper.map(restauranteInput, Restaurante.class); //com  modelmapper não está funcionando o método adicionar
+//		Restaurante restaurante = new Restaurante();
+//		restaurante.setNome(restauranteInput.getNome());
+//		restaurante.setTaxaFrete(restauranteInput.getTaxaFrete());
+//		
+//		Cozinha cozinha = new Cozinha();
+//		cozinha.setId(restauranteInput.getCozinhaId().getId());
+//		restaurante.setCozinha(cozinha);
+//		
+//		return restaurante;
+//	}
+
+	
+	public void copyToDomainObject(RestauranteInput restauranteInput, Restaurante restaurante) {
+		/*
+		 * Caused by: org.hibernate.HibernateException: identifier of an instance of com.evelyn.algafood.domain.model.Restaurante was altered from 1 to 2
+		 * Para evitar esta excpetion, instanciar uma nova cozinha para o JPA não entender que ao trocar de cozinha no atualizar, 
+		 * está trocando o Id daquela cozinha por outro e sim, trocando no restaurante uma outra cozinha já existente 
+		 */
+		restaurante.setCozinha(new Cozinha()); //é uma intância limpa, não tem rastro do JPA
+		
+		/*
+		 * note que ele não passa mais um objeto Restaurante como acima, somente a variável do tipo
+		 * não instancia como instancia acima para nós, porque o objeto já é passado por parâmetro.
+		 */
+		modelMapper.map(restauranteInput, restaurante); 
+	}
+}
+-----------------------------------------------------------------

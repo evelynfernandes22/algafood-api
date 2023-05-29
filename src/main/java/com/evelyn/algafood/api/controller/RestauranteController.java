@@ -1,10 +1,10 @@
 package com.evelyn.algafood.api.controller;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 
 import javax.validation.Valid;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.SmartValidator;
@@ -24,6 +24,7 @@ import com.evelyn.algafood.api.assembler.RestauranteDtoAssembler;
 import com.evelyn.algafood.api.assembler.RestauranteInputDisassembler;
 import com.evelyn.algafood.core.validation.ValidacaoException;
 import com.evelyn.algafood.domain.exception.CozinhaNaoEncontradaException;
+import com.evelyn.algafood.domain.exception.EstadoNaoEncontradoException;
 import com.evelyn.algafood.domain.exception.NegocioException;
 import com.evelyn.algafood.domain.model.Restaurante;
 import com.evelyn.algafood.domain.repository.RestauranteRepository;
@@ -44,41 +45,61 @@ public class RestauranteController {
 	
 	@GetMapping
 	public List<RestauranteDTO> listar(){
+		
 		return restauranteDtoAssembler.toCollectionModel(restauranteRepository.findAll());
 		
 	}
 	
 	@GetMapping("/{restauranteId}")
 	public RestauranteDTO buscar(@PathVariable ("restauranteId") Long restauranteId){
-		Restaurante restaurante =  cadastroRestauranteService.buscarOuFalhar(restauranteId);
 		
-		RestauranteDTO dto = restauranteDtoAssembler.toModel(restaurante);
-		
-		return dto;
+		return restauranteDtoAssembler.toModel(cadastroRestauranteService.buscarOuFalhar(restauranteId));
 	}
 	
-
+	
+//	@PostMapping
+//	@ResponseStatus(HttpStatus.CREATED)
+//	public RestauranteDTO adicionar(@RequestBody @Valid RestauranteInput restauranteInput) {
+//
+//		try {
+//			Restaurante restaurante = restauranteInputDisassembler.toDomainObject(restauranteInput);
+//			return  restauranteDtoAssembler.toModel(cadastroRestauranteService.salvar(restaurante));
+//
+//		} catch (EstadoNaoEncontradoException e) {
+//			throw new NegocioException(e.getMessage(), e);
+//		}
+//	}
+	
 	@PostMapping
-	@ResponseStatus(value = HttpStatus.CREATED)
-	public RestauranteDTO adicionar (@RequestBody @Valid RestauranteInput restauranteInput){
+	@ResponseStatus(HttpStatus.CREATED)
+	public RestauranteDTO adicionar(@RequestBody @Valid RestauranteInput restauranteInput) {
+
 		try {
 			Restaurante restaurante = restauranteInputDisassembler.toDomainObject(restauranteInput);
-			return restauranteDtoAssembler.toModel(cadastroRestauranteService.salvar(restaurante));
-			
-		} catch (CozinhaNaoEncontradaException e) {
+			restaurante.setDataCadastro(OffsetDateTime.now());
+			return  restauranteDtoAssembler.toModel(cadastroRestauranteService.salvar(restaurante));
+
+		} catch (EstadoNaoEncontradoException e) {
 			throw new NegocioException(e.getMessage(), e);
 		}
 	}
-
 	
 	@PutMapping("/{restauranteId}")
 	public RestauranteDTO atualizar(@PathVariable Long restauranteId,@RequestBody @Valid RestauranteInput restauranteInput){
 		
 		try {
-			Restaurante restaurante = restauranteInputDisassembler.toDomainObject(restauranteInput);
+//			Restaurante restaurante = restauranteInputDisassembler.toDomainObject(restauranteInput);
 			Restaurante restauranteAtual = cadastroRestauranteService.buscarOuFalhar(restauranteId);
-			BeanUtils.copyProperties(restaurante, restauranteAtual,"id", "formasPagamento", "endereco", 
-					"dataCadastro", "produtos");
+			
+			/*
+			 * Com ModelMapper garante que a cópia só venha com as propriedades que o solicitante pode enviar, sem campos nulos
+			 * como no BeansUtils anteriormente necessário, utilizando como referência Restaurante.
+			 * 
+			 * // BeanUtils.copyProperties(restaurante, restauranteAtual,"id", "formasPagamento", "endereco", "dataCadastro", "produtos");
+			 */
+			
+			restauranteInputDisassembler.copyToDomainObject(restauranteInput, restauranteAtual);
+			
 			return restauranteDtoAssembler.toModel(cadastroRestauranteService.salvar(restauranteAtual));
 			
 		} catch (CozinhaNaoEncontradaException e) {
