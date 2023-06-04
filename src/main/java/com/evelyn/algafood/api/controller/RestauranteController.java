@@ -1,6 +1,5 @@
 package com.evelyn.algafood.api.controller;
 
-import java.time.OffsetDateTime;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -23,6 +22,7 @@ import com.evelyn.algafood.api.DTO.input.RestauranteInput;
 import com.evelyn.algafood.api.assembler.RestauranteDtoAssembler;
 import com.evelyn.algafood.api.assembler.RestauranteInputDisassembler;
 import com.evelyn.algafood.core.validation.ValidacaoException;
+import com.evelyn.algafood.domain.exception.CidadeNaoEncontradaException;
 import com.evelyn.algafood.domain.exception.CozinhaNaoEncontradaException;
 import com.evelyn.algafood.domain.exception.EstadoNaoEncontradoException;
 import com.evelyn.algafood.domain.exception.NegocioException;
@@ -56,30 +56,15 @@ public class RestauranteController {
 		return restauranteDtoAssembler.toModel(cadastroRestauranteService.buscarOuFalhar(restauranteId));
 	}
 	
-	
-//	@PostMapping
-//	@ResponseStatus(HttpStatus.CREATED)
-//	public RestauranteDTO adicionar(@RequestBody @Valid RestauranteInput restauranteInput) {
-//
-//		try {
-//			Restaurante restaurante = restauranteInputDisassembler.toDomainObject(restauranteInput);
-//			return  restauranteDtoAssembler.toModel(cadastroRestauranteService.salvar(restaurante));
-//
-//		} catch (EstadoNaoEncontradoException e) {
-//			throw new NegocioException(e.getMessage(), e);
-//		}
-//	}
-	
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public RestauranteDTO adicionar(@RequestBody @Valid RestauranteInput restauranteInput) {
 
 		try {
 			Restaurante restaurante = restauranteInputDisassembler.toDomainObject(restauranteInput);
-			restaurante.setDataCadastro(OffsetDateTime.now());
 			return  restauranteDtoAssembler.toModel(cadastroRestauranteService.salvar(restaurante));
 
-		} catch (EstadoNaoEncontradoException e) {
+		} catch (EstadoNaoEncontradoException | CidadeNaoEncontradaException e) {
 			throw new NegocioException(e.getMessage(), e);
 		}
 	}
@@ -88,24 +73,47 @@ public class RestauranteController {
 	public RestauranteDTO atualizar(@PathVariable Long restauranteId,@RequestBody @Valid RestauranteInput restauranteInput){
 		
 		try {
-//			Restaurante restaurante = restauranteInputDisassembler.toDomainObject(restauranteInput);
 			Restaurante restauranteAtual = cadastroRestauranteService.buscarOuFalhar(restauranteId);
-			
-			/*
-			 * Com ModelMapper garante que a cópia só venha com as propriedades que o solicitante pode enviar, sem campos nulos
-			 * como no BeansUtils anteriormente necessário, utilizando como referência Restaurante.
-			 * 
-			 * // BeanUtils.copyProperties(restaurante, restauranteAtual,"id", "formasPagamento", "endereco", "dataCadastro", "produtos");
-			 */
-			
 			restauranteInputDisassembler.copyToDomainObject(restauranteInput, restauranteAtual);
-			
 			return restauranteDtoAssembler.toModel(cadastroRestauranteService.salvar(restauranteAtual));
 			
-		} catch (CozinhaNaoEncontradaException e) {
+		} catch (CozinhaNaoEncontradaException | CidadeNaoEncontradaException e) {
 			throw new NegocioException(e.getMessage(), e);
 		}
 	}
+	
+	@PutMapping("/{restauranteId}/ativo")
+	@ResponseStatus(value = HttpStatus.NO_CONTENT)
+	public void ativar(@PathVariable Long restauranteId) {
+		cadastroRestauranteService.ativar(restauranteId);
+	}
+	
+	@DeleteMapping("/{restauranteId}/inativo")
+	@ResponseStatus(value = HttpStatus.NO_CONTENT)
+	public void inativar(@PathVariable Long restauranteId) {
+		cadastroRestauranteService.inativar(restauranteId);
+	}
+
+	
+	@DeleteMapping("/{restauranteId}")
+	@ResponseStatus(value = HttpStatus.NO_CONTENT)
+	public void remover(@PathVariable Long restauranteId){
+		
+		cadastroRestauranteService.excluir(restauranteId);
+	}
+	
+	//METODOS PRIVADOS
+	
+	private void validate(Restaurante restaurante, String objectName) {
+		BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(restaurante, objectName);
+		validator.validate(restaurante, bindingResult);
+		
+		if(bindingResult.hasErrors()) {
+			throw new ValidacaoException(bindingResult);
+		}
+	}
+	
+//	ATUALIZAR PARCIAL
 	
 //	@PatchMapping ("/{restauranteId}")
 //	public RestauranteDTO atualizarParcial (@PathVariable Long restauranteId, 
@@ -152,22 +160,4 @@ public class RestauranteController {
 //		}
 //	}
 
-	
-	@DeleteMapping("/{restauranteId}")
-	@ResponseStatus(value = HttpStatus.NO_CONTENT)
-	public void remover(@PathVariable Long restauranteId){
-		
-		cadastroRestauranteService.excluir(restauranteId);
-	}
-	
-	//METODOS PRIVADOS
-	
-	private void validate(Restaurante restaurante, String objectName) {
-		BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(restaurante, objectName);
-		validator.validate(restaurante, bindingResult);
-		
-		if(bindingResult.hasErrors()) {
-			throw new ValidacaoException(bindingResult);
-		}
-	}
 }

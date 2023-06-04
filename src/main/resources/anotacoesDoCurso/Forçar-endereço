@@ -1,0 +1,49 @@
+@Getter
+@Setter
+public class EnderecoInput {
+	
+	/*
+	 * forçar o cliente a colocar o endereço, já que no banco está null e tem alguns 
+	 * endereços sem preenchimento. Ir direto no banco com o sistema em produção acarretaria uma quebra
+	 de contrato da API. Deste modo
+	 * Adicionar notblank
+	 */
+	
+	@NotBlank
+	private String cep;
+	@NotBlank
+	private String logradouro;
+	@NotBlank
+	private String  numero;
+	
+	private String complemento;
+	@NotBlank
+	private String bairro;
+	@Valid
+	@NotNull
+	private CidadeIdInput cidade;
+
+}
+
+//A classe restaurante que antes não tinha endereço passa a ter
+
+@Getter
+@Setter
+public class RestauranteInput {
+
+	@NotBlank
+	private String nome;
+
+	@NotNull
+	@PositiveOrZero
+	private BigDecimal taxaFrete;
+	
+	@Valid
+	@NotNull
+	private CozinhaIdInput cozinha;
+
+	@Valid
+	@NotNull
+	private EnderecoInput endereco;
+	
+}

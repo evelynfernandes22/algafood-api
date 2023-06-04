@@ -75,7 +75,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler{
 		Throwable rootCause = ExceptionUtils.getRootCause(ex);
 		
 		if (rootCause instanceof InvalidFormatException) {
-			return handleInvalidFormatException((InvalidFormatException) rootCause, headers, status, request);
+			return handleInvalidFormat((InvalidFormatException) rootCause, headers, status, request);
 		}else if(rootCause instanceof PropertyBindingException) {
 			return handlePropertyBinding((PropertyBindingException) rootCause, headers, status, request);
 		}
@@ -90,7 +90,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler{
 		return handleExceptionInternal(ex, problem, headers, status, request);
 	}
 
-	private ResponseEntity<Object> handleInvalidFormatException(InvalidFormatException ex,
+	private ResponseEntity<Object> handleInvalidFormat(InvalidFormatException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
 
 		String path = joinPath(ex.getPath());

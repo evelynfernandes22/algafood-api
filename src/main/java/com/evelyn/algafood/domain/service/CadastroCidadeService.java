@@ -14,16 +14,16 @@ import com.evelyn.algafood.domain.model.Cidade;
 import com.evelyn.algafood.domain.model.Estado;
 import com.evelyn.algafood.domain.repository.CidadeRepository;
 
+import lombok.AllArgsConstructor;
+
+@AllArgsConstructor
 @Service
 public class CadastroCidadeService {
 
 	private static final String MSG_CODIGO_CIDADE_EM_USO = "Cidade de código %d não pode ser removida, pois está em uso";
 
 
-	@Autowired
 	private CidadeRepository cidadeRepository;
-
-	@Autowired
 	private CadastroEstadoService cadastroEstadoService;
 
 	@Transactional

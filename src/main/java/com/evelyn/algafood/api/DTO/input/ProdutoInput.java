@@ -2,31 +2,23 @@ package com.evelyn.algafood.api.DTO.input;
 
 import java.math.BigDecimal;
 
-import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.PositiveOrZero;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class RestauranteInput {
-
+public class ProdutoInput {
+	
 	@NotBlank
 	private String nome;
-
+	@NotBlank
+	private String descricao;
 	@NotNull
-	@PositiveOrZero
-	private BigDecimal taxaFrete;
+	private BigDecimal preco;
 	
-	@Valid
-	@NotNull
-	private CozinhaIdInput cozinha;
+	private boolean ativo;
 
-	@Valid
-	@NotNull
-	private EnderecoInput endereco;
-	
 }

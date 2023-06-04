@@ -59,7 +59,6 @@ public class CozinhaController {
 		
 		Cozinha cozinhaAtual = cadastroCozinhaService.buscarOuFalhar(cozinhaId);
 		cozinhaInputDisassembler.copyToDomainObject(cozinhaInput, cozinhaAtual);
-//		BeanUtils.copyProperties(cozinha, cozinhaAtual, "id");
 
 		return cozinhaDtoAssembler.toModel(cadastroCozinhaService.salvar(cozinhaAtual));
 
