@@ -6,10 +6,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
-import com.evelyn.algafood.domain.exception.CozinhaNaoEncontradaException;
 import com.evelyn.algafood.domain.exception.EntidadeEmUsoException;
 import com.evelyn.algafood.domain.exception.FormaPagamentoNaoEncontradoException;
-import com.evelyn.algafood.domain.model.Cozinha;
 import com.evelyn.algafood.domain.model.FormaPagamento;
 import com.evelyn.algafood.domain.repository.FormaPagamentoRepository;
 

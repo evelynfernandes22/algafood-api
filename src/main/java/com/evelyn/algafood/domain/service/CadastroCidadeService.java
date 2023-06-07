@@ -2,14 +2,12 @@ package com.evelyn.algafood.domain.service;
 
 import javax.transaction.Transactional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import com.evelyn.algafood.domain.exception.CidadeNaoEncontradaException;
 import com.evelyn.algafood.domain.exception.EntidadeEmUsoException;
-import com.evelyn.algafood.domain.exception.EntidadeNaoEncontradaException;
 import com.evelyn.algafood.domain.model.Cidade;
 import com.evelyn.algafood.domain.model.Estado;
 import com.evelyn.algafood.domain.repository.CidadeRepository;
