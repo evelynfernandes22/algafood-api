@@ -1,5 +1,7 @@
 package com.evelyn.algafood.domain.service;
 
+import java.util.List;
+
 import javax.transaction.Transactional;
 
 import org.springframework.dao.DataIntegrityViolationException;
@@ -12,6 +14,7 @@ import com.evelyn.algafood.domain.model.Cidade;
 import com.evelyn.algafood.domain.model.Cozinha;
 import com.evelyn.algafood.domain.model.FormaPagamento;
 import com.evelyn.algafood.domain.model.Restaurante;
+import com.evelyn.algafood.domain.model.Usuario;
 import com.evelyn.algafood.domain.repository.RestauranteRepository;
 
 import lombok.AllArgsConstructor;
@@ -26,6 +29,7 @@ public class CadastroRestauranteService {
 	private CadastroCozinhaService cadastroCozinhaService;
 	private CadastroCidadeService cadastroCidadeService;
 	private CadastroFormaPagamentoService cadastroFormaPagamentoService;
+	private CadastroUsuarioService cadastroUsuarioService;
 
 	@Transactional
 	public Restaurante salvar(Restaurante restaurante) {
@@ -71,6 +75,29 @@ public class CadastroRestauranteService {
 		restauranteAtual.inativar();
 	}
 	
+	@Transactional
+	public void ativar(List<Long> restauranteIds) {
+		restauranteIds.forEach(this::ativar);
+	}
+	
+	@Transactional
+	public void inativar(List<Long> restauranteIds) {
+		restauranteIds.forEach(this::inativar);
+	}
+	
+	@Transactional
+	public void abrir(Long restauranteId) {
+		Restaurante restaurante = buscarOuFalhar(restauranteId);
+		restaurante.abertura();
+	}
+	
+	@Transactional
+	public void fechar (Long restauranteId) {
+		Restaurante restaurante = buscarOuFalhar(restauranteId);
+		restaurante.fechamento();
+	}
+	
+	
 	public Restaurante buscarOuFalhar(Long restauranteId) {
 		return restauranteRepository.findById(restauranteId).orElseThrow(
 				() -> new RestauranteNaoEncontradoException(restauranteId));
@@ -92,5 +119,21 @@ public class CadastroRestauranteService {
 		FormaPagamento formaPagamento = cadastroFormaPagamentoService.buscarOuFalhar(formaPagamentoId);
 		
 		restaurante.adicionarFormaPagamento(formaPagamento);
+	}
+	
+	@Transactional
+	public void desassociarResponsavel(Long usuarioId, Long restauranteId) {
+		Restaurante restaurante = buscarOuFalhar(restauranteId);
+		Usuario usuario = cadastroUsuarioService.buscarOuFalhar(usuarioId);
+		
+		restaurante.removerResponsavel(usuario);
+	}
+	
+	@Transactional
+	public void associarResponsavel(Long usuarioId, Long RestauranteId) {
+		Restaurante restaurante = buscarOuFalhar(RestauranteId);
+		Usuario usuario = cadastroUsuarioService.buscarOuFalhar(usuarioId);
+		
+		restaurante.adicionarResponsavel(usuario);
 	}
 }

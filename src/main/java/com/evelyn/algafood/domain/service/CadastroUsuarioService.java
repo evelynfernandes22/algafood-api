@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.evelyn.algafood.domain.exception.NegocioException;
 import com.evelyn.algafood.domain.exception.UsuarioNaoEncontradoException;
+import com.evelyn.algafood.domain.model.Grupo;
 import com.evelyn.algafood.domain.model.Usuario;
 import com.evelyn.algafood.domain.repository.UsuarioRepository;
 
@@ -18,6 +19,7 @@ import lombok.AllArgsConstructor;
 public class CadastroUsuarioService {
 	
 	private UsuarioRepository usuarioRepository;
+	private CadastroGrupoService cadastroGrupoService;
 	
 	@Transactional
 	public Usuario salvar(Usuario usuario) {
@@ -47,6 +49,25 @@ public class CadastroUsuarioService {
 	public Usuario buscarOuFalhar(Long usuarioId) {
 		return usuarioRepository.findById(usuarioId).orElseThrow(
 				() -> new UsuarioNaoEncontradoException(usuarioId));
-			
+		
 	}
+	
+	@Transactional
+	public void desassociarGrupo(Long usuarioId, Long grupoId) {
+	    Usuario usuario = buscarOuFalhar(usuarioId);
+	    Grupo grupo = cadastroGrupoService.buscarOuFalhar(grupoId);
+	    
+	    usuario.removerGrupo(grupo);
+	}
+
+	@Transactional
+	public void associarGrupo(Long usuarioId, Long grupoId) {
+	    Usuario usuario = buscarOuFalhar(usuarioId);
+	    Grupo grupo = cadastroGrupoService.buscarOuFalhar(grupoId);
+	    
+	    usuario.adicionarGrupo(grupo);
+	}
+	
+	
+	
 }

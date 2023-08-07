@@ -1,5 +1,6 @@
 package com.evelyn.algafood.api.assembler;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,7 +22,7 @@ public class GrupoDtoAssembler {
 		return modelMapper.map(grupo, GrupoDTO.class);
 	}
 	
-	public List<GrupoDTO> toCollectionModel(List<Grupo> grupos){
+	public List<GrupoDTO> toCollectionModel(Collection<Grupo> grupos){
 		return grupos.stream()
 				.map(grupo -> toModel(grupo))
 				.collect(Collectors.toList());

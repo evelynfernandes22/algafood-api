@@ -26,6 +26,7 @@ import com.evelyn.algafood.domain.exception.CidadeNaoEncontradaException;
 import com.evelyn.algafood.domain.exception.CozinhaNaoEncontradaException;
 import com.evelyn.algafood.domain.exception.EstadoNaoEncontradoException;
 import com.evelyn.algafood.domain.exception.NegocioException;
+import com.evelyn.algafood.domain.exception.RestauranteNaoEncontradoException;
 import com.evelyn.algafood.domain.model.Restaurante;
 import com.evelyn.algafood.domain.repository.RestauranteRepository;
 import com.evelyn.algafood.domain.service.CadastroRestauranteService;
@@ -88,12 +89,49 @@ public class RestauranteController {
 		cadastroRestauranteService.ativar(restauranteId);
 	}
 	
-	@DeleteMapping("/{restauranteId}/inativo")
+	@DeleteMapping("/{restauranteId}/ativo")
 	@ResponseStatus(value = HttpStatus.NO_CONTENT)
 	public void inativar(@PathVariable Long restauranteId) {
 		cadastroRestauranteService.inativar(restauranteId);
 	}
+	
+	// PUT/restaurantes/ativacoes
+	//	[1,3,4]
+	
+	// DELETE/restaurantes/ativacoes
+	
+	@PutMapping("/ativacoes")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void ativarMultiplos(@RequestBody List<Long> restaurantesIds) {
+		try {
+			cadastroRestauranteService.ativar(restaurantesIds);
+			
+		} catch (RestauranteNaoEncontradoException e) {
+			throw new NegocioException(e.getMessage(), e);
+		}
+	}
 
+	@DeleteMapping("/ativacoes")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void inativarMultiplos(@RequestBody List<Long> restaurantesIds) {
+		try {
+			cadastroRestauranteService.inativar(restaurantesIds);
+			
+		} catch (RestauranteNaoEncontradoException e) {
+			throw new NegocioException(e.getMessage(), e);
+		}
+	}
+	@PutMapping("/{restauranteId}/abertura")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void abertura(@PathVariable Long restauranteId) {
+		cadastroRestauranteService.abrir(restauranteId);
+	}
+	
+	@PutMapping("/{restauranteId}/fechamento")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void fechar(@PathVariable Long restauranteId) {
+		cadastroRestauranteService.fechar(restauranteId);
+	}
 	
 	@DeleteMapping("/{restauranteId}")
 	@ResponseStatus(value = HttpStatus.NO_CONTENT)

@@ -6,7 +6,6 @@ import org.springframework.stereotype.Repository;
 import com.evelyn.algafood.domain.model.Grupo;
 
 @Repository
-public interface grupoRepository extends JpaRepository<Grupo, Long> {
+public interface GrupoRepository extends JpaRepository<Grupo, Long>{
 
-	
 }

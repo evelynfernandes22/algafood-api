@@ -22,7 +22,7 @@ import com.evelyn.algafood.api.assembler.GrupoInputDisassembler;
 import com.evelyn.algafood.domain.exception.GrupoNaoEncontradoException;
 import com.evelyn.algafood.domain.exception.NegocioException;
 import com.evelyn.algafood.domain.model.Grupo;
-import com.evelyn.algafood.domain.repository.grupoRepository;
+import com.evelyn.algafood.domain.repository.GrupoRepository;
 import com.evelyn.algafood.domain.service.CadastroGrupoService;
 
 import lombok.AllArgsConstructor;
@@ -33,7 +33,7 @@ import lombok.AllArgsConstructor;
 public class GrupoController {
 
 	private CadastroGrupoService cadastroGrupoService;
-	private grupoRepository grupoRepository;
+	private GrupoRepository grupoRepository;
 	private GrupoDtoAssembler grupoDtoAssembler;
 	private GrupoInputDisassembler grupoInputDisassembler;
 	

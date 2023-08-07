@@ -9,7 +9,8 @@ import org.springframework.stereotype.Service;
 import com.evelyn.algafood.domain.exception.EntidadeEmUsoException;
 import com.evelyn.algafood.domain.exception.GrupoNaoEncontradoException;
 import com.evelyn.algafood.domain.model.Grupo;
-import com.evelyn.algafood.domain.repository.grupoRepository;
+import com.evelyn.algafood.domain.model.Permissao;
+import com.evelyn.algafood.domain.repository.GrupoRepository;
 
 import lombok.AllArgsConstructor;
 
@@ -18,7 +19,9 @@ import lombok.AllArgsConstructor;
 public class CadastroGrupoService {
 
 	private static final String MSG_GRUPO_EM_USO = "Grupo de código %d não pode ser removido, pois está em uso"; 
-	private grupoRepository grupoRepository;
+	
+	private GrupoRepository grupoRepository;
+	private CadastroPermissaoService cadastroPermissaoService;
 	
 	@Transactional
 	public Grupo salvar(Grupo grupo) {
@@ -46,5 +49,21 @@ public class CadastroGrupoService {
 		return	grupoRepository.findById(grupoId).orElseThrow(
 				() -> new GrupoNaoEncontradoException(grupoId));
 		
+	}
+	
+	@Transactional
+	public void desassociarPermissao(Long grupoId, Long permissaoId) {
+		Grupo grupo = buscarOuFalhar(grupoId);
+		Permissao permissao = cadastroPermissaoService.buscarOuFalhar(permissaoId);
+		
+		grupo.removerPermissoes(permissao);
+	}
+	
+	@Transactional
+	public void associarPermissao(Long grupoId, Long permissaoId) {
+		Grupo grupo = buscarOuFalhar(grupoId);
+		Permissao permissao = cadastroPermissaoService.buscarOuFalhar(permissaoId);
+		
+		grupo.adicionarPermissoes(permissao);
 	}
 }
