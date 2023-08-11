@@ -60,7 +60,7 @@ insert into permissao (id, nome, descricao) values (2, 'EDITAR_COZINHAS', 'Permi
 
 insert into restaurante_forma_pagamento (restaurante_id, forma_pagamento_id) values (1, 1), (1, 2), (1, 3), (2, 3), (3, 2), (3, 3), (4, 1), (4, 2),(5, 1), (5, 3), (6, 1), (6, 2), (6, 3);
 
-insert into produto (nome, descricao, preco, ativo, restaurante_id) values ('Pad Thai', 'Tradicional macarrao frito Tailandes', 25.00, 1, 1);
+insert into produto (nome, descricao, preco, ativo, restaurante_id) values ('Pad Thai', 'Tradicional macarrao frito Tailandes', 25.00, 0, 1);
 insert into produto (nome, descricao, preco, ativo, restaurante_id) values ('Bistecca alla Fiorentina', 'Suculento bife grande de bisteca (T-bone), de 4 a 6 cm de altura, grelhado', 80, 1, 2);
 insert into produto (nome, descricao, preco, ativo, restaurante_id) values ('Porçao de frango','500g de frango à passarinho frito no capricho',21, 1, 4);
 insert into produto (nome, descricao, preco, ativo, restaurante_id) values ('Taco Tradicional','com a tortilha de milho em forma de disco',25, 1, 5);
