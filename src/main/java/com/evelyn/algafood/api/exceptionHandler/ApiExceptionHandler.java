@@ -1,6 +1,5 @@
 package com.evelyn.algafood.api.exceptionHandler;
 
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.stream.Collectors;

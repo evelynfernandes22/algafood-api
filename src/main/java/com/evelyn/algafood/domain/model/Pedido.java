@@ -21,6 +21,7 @@ import javax.persistence.OneToMany;
 
 import org.hibernate.annotations.CreationTimestamp;
 
+import com.evelyn.algafood.domain.exception.NegocioException;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
@@ -36,6 +37,8 @@ public class Pedido {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@EqualsAndHashCode.Include
 	private Long id;
+	
+	private String codigo;
 	
 	private BigDecimal subtotal;
 	private BigDecimal taxaFrete;
@@ -83,5 +86,29 @@ public class Pedido {
 		this.ValorTotal = this.subtotal.add(this.taxaFrete);
 	}
 
+	public void confirmar() {
+		setStatus(StatusPedido.CONFIRMADO);
+		setDataConfirmacao(OffsetDateTime.now());
+	}
+	
+	public void entregar() {
+		setStatus(StatusPedido.ENTREGUE);
+		setDataEntrega(OffsetDateTime.now());
+	}
+	
+	public void cancelar() {
+		setStatus(StatusPedido.CANCELADO);
+		setDataCancelamento(OffsetDateTime.now());
+	}
+	
+	//subscrevendo o set de status do lombok
+	private void setStatus(StatusPedido novoStatus) {
+		if(getStatus().naoPodeAlterarPara(novoStatus)) {
+			throw new NegocioException(String.format("O Status do pedido '%s' não pode ser alterado de '%s' para '%s'",
+					getCodigo(), getStatus(), novoStatus.getDescricao()));
+		}
+		
+		this.status = novoStatus;
+	}
 
 }
