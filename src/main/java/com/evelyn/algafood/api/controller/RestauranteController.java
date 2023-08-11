@@ -28,8 +28,10 @@ import com.evelyn.algafood.domain.exception.EstadoNaoEncontradoException;
 import com.evelyn.algafood.domain.exception.NegocioException;
 import com.evelyn.algafood.domain.exception.RestauranteNaoEncontradoException;
 import com.evelyn.algafood.domain.model.Restaurante;
+import com.evelyn.algafood.domain.model.view.RestauranteView;
 import com.evelyn.algafood.domain.repository.RestauranteRepository;
 import com.evelyn.algafood.domain.service.CadastroRestauranteService;
+import com.fasterxml.jackson.annotation.JsonView;
 
 import lombok.AllArgsConstructor;
 
@@ -44,12 +46,36 @@ public class RestauranteController {
 	private RestauranteDtoAssembler restauranteDtoAssembler;
 	private RestauranteInputDisassembler restauranteInputDisassembler;
 	
+	
+	@JsonView(RestauranteView.Resumo.class)
 	@GetMapping
 	public List<RestauranteDTO> listar(){
-		
 		return restauranteDtoAssembler.toCollectionModel(restauranteRepository.findAll());
-		
 	}
+	
+	@JsonView(RestauranteView.ApenasNome.class)
+	@GetMapping(params = "projecao=apenas-nome")
+	public List<RestauranteDTO> listarApenasNomes(){
+		return listar();
+	}
+
+//DINAMICAMENTE
+//	@GetMapping
+//	public MappingJacksonValue listar(@RequestParam(required=false) String projecao){
+//		List<Restaurante> restaurantes = restauranteRepository.findAll();
+//		List<RestauranteDTO> restauranteDto =  restauranteDtoAssembler.toCollectionModel(restaurantes);
+//		
+//		MappingJacksonValue restaurantesWrapper = new MappingJacksonValue(restauranteDto);
+//		restaurantesWrapper.setSerializationView(RestauranteView.Resumo.class);
+//		
+//		if("apenas-nome".equals(projecao)) {
+//			restaurantesWrapper.setSerializationView(RestauranteView.ApenasNome.class);
+//		}else if("completo".equals(projecao)) {
+//			restaurantesWrapper.setSerializationView(null);
+//		}
+//		
+//		return restaurantesWrapper;
+//	}
 	
 	@GetMapping("/{restauranteId}")
 	public RestauranteDTO buscar(@PathVariable ("restauranteId") Long restauranteId){
