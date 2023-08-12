@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonFilter;
 import lombok.Getter;
 import lombok.Setter;
 
-@JsonFilter("pedidoFilter")
+//@JsonFilter("pedidoFilter")  // comentado para testar PedidoSpec
 @Getter
 @Setter
 public class PedidoResumoDTO {

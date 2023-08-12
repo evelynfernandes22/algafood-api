@@ -1,8 +1,5 @@
 package com.evelyn.algafood.infraestructure.repository;
 
-import static com.evelyn.algafood.infraestructure.repository.spec.RestauranteSpec.comFreteGratis;
-import static com.evelyn.algafood.infraestructure.repository.spec.RestauranteSpec.comNomeSemelhante;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
