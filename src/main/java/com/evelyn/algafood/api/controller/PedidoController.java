@@ -1,6 +1,7 @@
 package com.evelyn.algafood.api.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.Valid;
 
@@ -23,6 +24,7 @@ import com.evelyn.algafood.api.DTO.input.PedidoInput;
 import com.evelyn.algafood.api.assembler.PedidoDtoAssembler;
 import com.evelyn.algafood.api.assembler.PedidoInputDisassembler;
 import com.evelyn.algafood.api.assembler.PedidoResumoDtoAssembler;
+import com.evelyn.algafood.core.data.PageableTranslator;
 import com.evelyn.algafood.domain.exception.EntidadeNaoEncontradaException;
 import com.evelyn.algafood.domain.exception.NegocioException;
 import com.evelyn.algafood.domain.model.Pedido;
@@ -47,6 +49,8 @@ public class PedidoController {
 
 	@GetMapping
 	public Page<PedidoResumoDTO> pesquisar(@PageableDefault(size = 10)Pageable pageable,  PedidoFilter filter){
+		
+		pageable = traduzirPageable(pageable);
 		
 		Page<Pedido> pedidosPage = pedidoRepository.findAll(PedidoSpec.usandoFiltro(filter), pageable);
 		List<PedidoResumoDTO> pedidosDto = pedidoResumoDtoAssembler.toCollectionModel(pedidosPage.getContent());
@@ -106,5 +110,16 @@ public class PedidoController {
 		} catch (EntidadeNaoEncontradaException e) {
 	        throw new NegocioException(e.getMessage(), e);
 		}
+	}
+	
+	private Pageable traduzirPageable(Pageable apiPageable) {
+		var mapeamento = Map.of(
+				"codigo", "codigo",
+				"restaurante.nome", "restaurante.nome",
+				"nomeCliente", "cliente.nome",
+				"valorTotal", "valorTotal"
+			);
+		
+		return PageableTranslator.translate(apiPageable, mapeamento);
 	}
 }
