@@ -27,10 +27,10 @@ import com.evelyn.algafood.api.assembler.PedidoResumoDtoAssembler;
 import com.evelyn.algafood.core.data.PageableTranslator;
 import com.evelyn.algafood.domain.exception.EntidadeNaoEncontradaException;
 import com.evelyn.algafood.domain.exception.NegocioException;
+import com.evelyn.algafood.domain.filter.PedidoFilter;
 import com.evelyn.algafood.domain.model.Pedido;
 import com.evelyn.algafood.domain.model.Usuario;
 import com.evelyn.algafood.domain.repository.PedidoRepository;
-import com.evelyn.algafood.domain.repository.filter.PedidoFilter;
 import com.evelyn.algafood.domain.service.GeracaoPedidoService;
 import com.evelyn.algafood.infraestructure.repository.spec.PedidoSpec;
 

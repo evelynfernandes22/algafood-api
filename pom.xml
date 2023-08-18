@@ -17,6 +17,8 @@
 
 	<properties>
 		<java.version>11</java.version>
+		<modelmapper.version>3.0.0</modelmapper.version>
+		<jasperreports.version>6.20.5</jasperreports.version>
 	</properties>
 
 	<dependencies>
@@ -99,7 +101,7 @@
 		<dependency>
 			<groupId>org.modelmapper</groupId>
 			<artifactId>modelmapper</artifactId>
-			<version>3.0.0</version>
+			<version>${modelmapper.version}</version>
 		</dependency>
 
 
@@ -109,6 +111,21 @@
 			<artifactId>guava</artifactId>
 			<version>32.1.2-jre</version>
 		</dependency>
+
+		<!--Jasper Reports ... PDF -->
+		<dependency>
+			<groupId>net.sf.jasperreports</groupId>
+			<artifactId>jasperreports</artifactId>
+			<version>${jasperreports.version}</version>
+		</dependency>
+		
+		<!-- jasperreports-functions -->
+		<dependency>
+		    <groupId>net.sf.jasperreports</groupId>
+		    <artifactId>jasperreports-functions</artifactId>
+		    <version>${jasperreports.version}</version>
+		</dependency>
+
 
 	</dependencies>
 

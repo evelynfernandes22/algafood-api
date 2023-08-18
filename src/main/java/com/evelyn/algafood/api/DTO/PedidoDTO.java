@@ -4,8 +4,6 @@ import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.List;
 
-import com.evelyn.algafood.domain.model.Endereco;
-
 import lombok.Getter;
 import lombok.Setter;
 
