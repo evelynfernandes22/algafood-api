@@ -42,12 +42,10 @@ public class RestauranteRepositoryImpl implements RestauranteRepositoryQueries {
 		
 		if(StringUtils.hasText(nome)) {
 			predicates.add(builder.like(root.get("nome"),"%" + nome + "%"));
-			
 		}
 		if(taxaFreteInicial != null) {
 			predicates.add(builder.greaterThanOrEqualTo(root.get("taxaFrete"), taxaFreteInicial));
 		}
-		
 		if(taxaFreteFinal != null) {
 			predicates.add(builder.lessThanOrEqualTo(root.get("taxaFrete"), taxaFreteFinal));
 		}		

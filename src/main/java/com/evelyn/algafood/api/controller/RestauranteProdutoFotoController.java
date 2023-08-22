@@ -1,7 +1,6 @@
 package com.evelyn.algafood.api.controller;
 
-import java.nio.file.Path;
-import java.util.UUID;
+import java.io.IOException;
 
 import javax.validation.Valid;
 
@@ -10,30 +9,43 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.evelyn.algafood.api.DTO.FotoProdutoDTO;
 import com.evelyn.algafood.api.DTO.input.FotoProdutoInput;
+import com.evelyn.algafood.api.assembler.FotoProdutoDtoAssembler;
+import com.evelyn.algafood.domain.model.FotoProduto;
+import com.evelyn.algafood.domain.model.Produto;
+import com.evelyn.algafood.domain.service.CadastroProdutoService;
+import com.evelyn.algafood.domain.service.CatalogoFotoProdutoService;
 
+import lombok.AllArgsConstructor;
+
+@AllArgsConstructor
 @RestController
 @RequestMapping(value = "/restaurantes/{restauranteId}/produtos/{produtoId}/foto")
 public class RestauranteProdutoFotoController {
 
+	private CatalogoFotoProdutoService catalogoFotoProdutoService;
+	private CadastroProdutoService cadastroProdutoService;
+	private FotoProdutoDtoAssembler fotoProdutoDtoAssembler;
 	
 	@PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public void atualizarFoto(@PathVariable Long restauranteId, @PathVariable Long produtoId, 
-			@Valid FotoProdutoInput fotoProdutoInput) {
-		var nomeArquivo = UUID.randomUUID().toString() + "_" + fotoProdutoInput.getArquivo().getOriginalFilename();
+	public FotoProdutoDTO atualizarFoto(@PathVariable Long restauranteId, @PathVariable Long produtoId, 
+			@Valid FotoProdutoInput fotoProdutoInput) throws IOException {
 		
-		//Onde quero salvar o arquivo
-		var arquivoFoto = Path.of("\\Users\\evely\\OneDrive\\Imagens\\catalogo", nomeArquivo); 
+		Produto produto = cadastroProdutoService.buscarOuFalhar(restauranteId, produtoId);
+		MultipartFile arquivo = fotoProdutoInput.getArquivo();
 		
-		System.out.println(fotoProdutoInput.getDescricao());
-		System.out.println(arquivoFoto);
-		System.out.println(fotoProdutoInput.getArquivo().getContentType());
+		FotoProduto foto = new FotoProduto();
+		foto.setProduto(produto);
+		foto.setDescricao(fotoProdutoInput.getDescricao());
+		foto.setContentType(arquivo.getContentType());
+		foto.setNomeArquivo(arquivo.getOriginalFilename());
+		foto.setTamanho(arquivo.getSize());
 		
-		try {
-			fotoProdutoInput.getArquivo().transferTo(arquivoFoto);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+		FotoProduto fotoSalva = catalogoFotoProdutoService.salvar(foto, arquivo.getInputStream());
+		
+		return fotoProdutoDtoAssembler.toModel(fotoSalva);
 	}
 }
