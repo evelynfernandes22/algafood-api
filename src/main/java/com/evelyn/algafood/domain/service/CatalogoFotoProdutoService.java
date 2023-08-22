@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.evelyn.algafood.domain.exception.FotoNaoEncontradaException;
 import com.evelyn.algafood.domain.model.FotoProduto;
 import com.evelyn.algafood.domain.repository.ProdutoRepository;
 import com.evelyn.algafood.domain.service.FotoStorageService.NovaFoto;
@@ -43,8 +44,14 @@ public class CatalogoFotoProdutoService {
 				.nomeArquivo(foto.getNomeArquivo())
 				.inputStream(dadosArquivo)
 				.build();
+		
 		fotoStorageService.substituir(nomeArquivoExistente, novaFoto);
 		
 		return foto;
+	}
+	
+	public FotoProduto buscarOuFalhar(Long restauranteId, Long produtoId) {
+		return produtoRepository.findFotoById(restauranteId, produtoId)
+				.orElseThrow(()-> new FotoNaoEncontradaException(restauranteId, produtoId));
 	}
 }

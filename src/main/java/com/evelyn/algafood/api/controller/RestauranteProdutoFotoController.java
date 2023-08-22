@@ -5,6 +5,7 @@ import java.io.IOException;
 import javax.validation.Valid;
 
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -47,5 +48,11 @@ public class RestauranteProdutoFotoController {
 		FotoProduto fotoSalva = catalogoFotoProdutoService.salvar(foto, arquivo.getInputStream());
 		
 		return fotoProdutoDtoAssembler.toModel(fotoSalva);
+	}
+	
+	@GetMapping
+	public FotoProdutoDTO buscar(@PathVariable Long restauranteId, @PathVariable Long produtoId) {
+		return fotoProdutoDtoAssembler.toModel(catalogoFotoProdutoService
+				.buscarOuFalhar(restauranteId, produtoId));
 	}
 }
