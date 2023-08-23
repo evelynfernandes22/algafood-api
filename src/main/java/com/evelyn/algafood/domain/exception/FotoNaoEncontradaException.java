@@ -9,7 +9,7 @@ private static final long serialVersionUID = 1L;
 	}
 
 	public FotoNaoEncontradaException (Long restauranteId, Long produtoId) {
-		this(String.format("Não existe uma foto cadastrada para o produto %d para o restaurante %d",
+		this(String.format("Não existe uma foto cadastrada do produto %d referente ao restaurante %d",
 				produtoId, restauranteId));
 	}
 }
